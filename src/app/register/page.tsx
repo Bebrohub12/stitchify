@@ -21,6 +21,14 @@ export default function Register() {
   const { register: registerUser, isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<RegisterFormData>()
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -42,12 +50,7 @@ export default function Register() {
     return null
   }
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<RegisterFormData>()
+ 
 
   const password = watch('password')
 

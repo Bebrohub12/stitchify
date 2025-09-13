@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { CheckCircle, Download, ArrowLeft, Mail } from 'lucide-react'
 import Link from 'next/link'
@@ -15,41 +15,85 @@ export default function PaymentSuccessPage() {
   const token = searchParams.get('token')
   const payerId = searchParams.get('PayerID')
 
-  useEffect(() => {
-    if (paymentId && token && payerId) {
-      // Execute the payment on the backend
-      executePayment()
-    } else {
-      setIsLoading(false)
-    }
-  }, [paymentId, token, payerId])
 
-  const executePayment = async () => {
-    try {
-      const response = await fetch('/api/payments/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          paymentId,
-          token,
-          payerId,
-        }),
-      })
+  const PaymentSuccessPage = () => {
+    const [transaction, setTransaction] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
 
-      if (response.ok) {
-        const data = await response.json()
-        setTransaction(data)
-      } else {
-        console.error('Payment execution failed')
+    // ✅ useCallback ensures function reference is stable
+    const executePayment = useCallback(async () => {
+      try {
+        const response = await fetch('/api/payments/execute', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            paymentId,
+            token,
+            payerId,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setTransaction(data)
+        } else {
+          console.error('Payment execution failed')
+        }
+      } catch (error) {
+        console.error('Error executing payment:', error)
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error('Error executing payment:', error)
-    } finally {
-      setIsLoading(false)
-    }
+    }, [paymentId, token, payerId]) // ✅ include dependencies here
+
+    useEffect(() => {
+      if (paymentId && token && payerId) {
+        executePayment()
+      } else {
+        setIsLoading(false)
+      }
+    }, [paymentId, token, payerId, executePayment]) // ✅ now safe
   }
+
+
+  // useEffect(() => {
+  //   if (paymentId && token && payerId) {
+  //     // Execute the payment on the backend
+  //     executePayment()
+  //   } else {
+  //     setIsLoading(false)
+  //   }
+  // }, [paymentId, token, payerId])
+
+
+  // const executePayment = async () => {
+  //   try {
+  //     const response = await fetch('/api/payments/execute', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         paymentId,
+  //         token,
+  //         payerId,
+  //       }),
+  //     })
+
+  //     if (response.ok) {
+  //       const data = await response.json()
+  //       setTransaction(data)
+  //     } else {
+  //       console.error('Payment execution failed')
+  //     }
+  //   } catch (error) {
+  //     console.error('Error executing payment:', error)
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   if (isLoading) {
     return (

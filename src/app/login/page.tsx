@@ -18,6 +18,12 @@ export default function Login() {
   const { login, isAuthenticated, loading } = useAuth()
   const router = useRouter()
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>()
+
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -39,11 +45,7 @@ export default function Login() {
     return null
   }
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormData>()
+
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
