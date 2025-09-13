@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                       <p className="text-gray-500 text-center py-8">No designs yet</p>
                     ) : (
                       <div className="space-y-4">
-                        {stats?.topDesigns?.slice(0, 5).map((design) => (
+                        {stats?.topDesigns?.slice(0, 5).map((design:any) => (
                           <div key={design._id} className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg">
                             <div className="flex-shrink-0">
                               {design.images && design.images[0] ? (
