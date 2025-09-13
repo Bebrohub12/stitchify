@@ -41,7 +41,7 @@ export async function POST(
     
     if (isFavorited) {
       // Remove from favorites
-      user.favorites = user.favorites?.filter(id => id.toString() !== designId) || []
+      user.favorites = user.favorites?.filter((id:any) => id.toString() !== designId) || []
     } else {
       // Add to favorites
       user.favorites = [...(user.favorites || []), designId]

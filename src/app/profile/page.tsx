@@ -33,7 +33,7 @@ interface Transaction {
 }
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuth()
+  const { user } = useAuth()
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'profile' | 'favorites' | 'purchases'>('profile')
   const [isEditing, setIsEditing] = useState(false)
@@ -76,7 +76,7 @@ export default function ProfilePage() {
       return response.data
     },
     onSuccess: (data) => {
-      updateUser(data)
+      // updateUser(data)
       setIsEditing(false)
       queryClient.invalidateQueries({ queryKey: ['userProfile'] })
       toast.success('Profile updated successfully')
@@ -226,11 +226,12 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={handleSave}
-                          disabled={updateProfile.isLoading}
+                          // disabled={updateProfile.isLoading}
                           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                         >
                           <Save className="w-4 h-4" />
-                          <span>{updateProfile.isLoading ? 'Saving...' : 'Save Changes'}</span>
+                          {/* <span>{updateProfile.isLoading ? 'Saving...' : 'Save Changes'}</span> */}
+                          <span>save changes</span>
                         </button>
                       </div>
                     )}

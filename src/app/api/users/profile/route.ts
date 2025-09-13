@@ -3,6 +3,9 @@ import { connectDB } from '@/lib/db'
 import { verifyToken } from '@/lib/auth'
 import User from '@/models/User'
 
+export const dynamic = 'force-dynamic'
+
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB()

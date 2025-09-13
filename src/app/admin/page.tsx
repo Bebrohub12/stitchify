@@ -264,7 +264,7 @@ export default function AdminDashboard() {
                       <p className="text-gray-500 text-center py-8">No transactions yet</p>
                     ) : (
                       <div className="space-y-4">
-                        {stats?.recentTransactions?.slice(0, 5).map((transaction) => (
+                        {stats?.recentTransactions?.slice(0, 5).map((transaction:any) => (
                           <div key={transaction._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                             <div>
                               <h4 className="font-medium text-gray-900">{transaction.design.title}</h4>

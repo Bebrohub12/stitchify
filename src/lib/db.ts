@@ -1,10 +1,22 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI
+// const MONGODB_URI = process.env.MONGODB_URI
 
-if (!MONGODB_URI) {
+
+if (!process.env.MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env.local')
 }
+
+const MONGODB_URI: string = process.env.MONGODB_URI
+
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: {
+    conn: typeof import('mongoose') | null
+    promise: Promise<typeof import('mongoose')> | null
+  }
+}
+
 
 let cached = global.mongoose
 

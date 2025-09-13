@@ -1,11 +1,14 @@
-'use client'
+// 
 
-import { useEffect, useState, useCallback } from 'react'
+'use client'
+export const dynamic = 'force-dynamic'
+
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { CheckCircle, Download, ArrowLeft, Mail } from 'lucide-react'
 import Link from 'next/link'
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
@@ -15,85 +18,36 @@ export default function PaymentSuccessPage() {
   const token = searchParams.get('token')
   const payerId = searchParams.get('PayerID')
 
+  const executePayment = useCallback(async () => {
+    try {
+      const response = await fetch('/api/payments/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentId, token, payerId }),
+      })
 
-  const PaymentSuccessPage = () => {
-    const [transaction, setTransaction] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
-
-    // ✅ useCallback ensures function reference is stable
-    const executePayment = useCallback(async () => {
-      try {
-        const response = await fetch('/api/payments/execute', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            paymentId,
-            token,
-            payerId,
-          }),
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          setTransaction(data)
-        } else {
-          console.error('Payment execution failed')
-        }
-      } catch (error) {
-        console.error('Error executing payment:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }, [paymentId, token, payerId]) // ✅ include dependencies here
-
-    useEffect(() => {
-      if (paymentId && token && payerId) {
-        executePayment()
+      if (response.ok) {
+        const data = await response.json()
+        setTransaction(data)
       } else {
-        setIsLoading(false)
+        console.error('Payment execution failed')
       }
-    }, [paymentId, token, payerId, executePayment]) // ✅ now safe
-  }
+    } catch (error) {
+      console.error('Error executing payment:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [paymentId, token, payerId])
 
-
-  // useEffect(() => {
-  //   if (paymentId && token && payerId) {
-  //     // Execute the payment on the backend
-  //     executePayment()
-  //   } else {
-  //     setIsLoading(false)
-  //   }
-  // }, [paymentId, token, payerId])
-
-
-  // const executePayment = async () => {
-  //   try {
-  //     const response = await fetch('/api/payments/execute', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         paymentId,
-  //         token,
-  //         payerId,
-  //       }),
-  //     })
-
-  //     if (response.ok) {
-  //       const data = await response.json()
-  //       setTransaction(data)
-  //     } else {
-  //       console.error('Payment execution failed')
-  //     }
-  //   } catch (error) {
-  //     console.error('Error executing payment:', error)
-  //   } finally {
-  //     setIsLoading(false)
-  //   }
-  // }
+  useEffect(() => {
+    if (paymentId && token && payerId) {
+      executePayment()
+    } else {
+      setIsLoading(false)
+    }
+  }, [paymentId, token, payerId, executePayment])
 
   if (isLoading) {
     return (
@@ -112,10 +66,7 @@ export default function PaymentSuccessPage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Payment Error</h2>
           <p className="text-gray-600 mb-4">There was an issue processing your payment.</p>
-          <Link
-            href="/contact"
-            className="text-primary-600 hover:text-primary-700 font-medium"
-          >
+          <Link href="/contact" className="text-primary-600 hover:text-primary-700 font-medium">
             Contact Support
           </Link>
         </div>
@@ -127,12 +78,11 @@ export default function PaymentSuccessPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          {/* Success Icon */}
+          {/* ✅ Success UI */}
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
             <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
 
-          {/* Success Message */}
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Payment Successful!
           </h1>
@@ -140,7 +90,7 @@ export default function PaymentSuccessPage() {
             Thank you for your purchase. Your embroidery design is now available for download.
           </p>
 
-          {/* Transaction Details */}
+          {/* ✅ Order Details */}
           <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Details</h2>
             <div className="space-y-3">
@@ -167,7 +117,7 @@ export default function PaymentSuccessPage() {
             </div>
           </div>
 
-          {/* Download Section */}
+          {/* ✅ Download Section */}
           <div className="bg-blue-50 rounded-lg p-6 mb-8">
             <h3 className="text-lg font-semibold text-blue-900 mb-4">
               Download Your Design
@@ -184,21 +134,7 @@ export default function PaymentSuccessPage() {
             </Link>
           </div>
 
-          {/* Email Notification */}
-          <div className="bg-yellow-50 rounded-lg p-6 mb-8">
-            <div className="flex items-center space-x-3 mb-3">
-              <Mail className="w-5 h-5 text-yellow-600" />
-              <h3 className="text-lg font-semibold text-yellow-900">
-                Check Your Email
-              </h3>
-            </div>
-            <p className="text-yellow-700">
-              We've sent you a confirmation email with download links and instructions.
-              Please check your inbox (and spam folder).
-            </p>
-          </div>
-
-          {/* Action Buttons */}
+          {/* ✅ Support / Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/profile"
@@ -214,21 +150,17 @@ export default function PaymentSuccessPage() {
               <span>Browse More Designs</span>
             </Link>
           </div>
-
-          {/* Support Information */}
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-500 mb-2">
-              Need help with your download or have questions?
-            </p>
-            <Link
-              href="/contact"
-              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-            >
-              Contact our support team
-            </Link>
-          </div>
         </div>
       </div>
     </div>
+  )
+}
+
+// ✅ Wrap page in Suspense to avoid Next.js error
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Loading payment...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

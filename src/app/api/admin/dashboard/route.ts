@@ -5,6 +5,8 @@ import User from '@/models/User'
 import Design from '@/models/Design'
 import Transaction from '@/models/Transaction'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB()
