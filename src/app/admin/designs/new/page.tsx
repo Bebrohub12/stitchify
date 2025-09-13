@@ -22,15 +22,19 @@ interface DesignFormData {
   images: File[]
 }
 
+interface DesignFiles {
+  [key: string]: File | null
+}
+
 export default function NewDesignPage() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   
-  // Update state to handle multiple images and design file
+  // Update state to handle multiple images and design files
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
-  const [designFile, setDesignFile] = useState<File | null>(null)
-  const [designFileName, setDesignFileName] = useState<string>('')
+  const [designFiles, setDesignFiles] = useState<DesignFiles>({})
+  const [selectedFormats, setSelectedFormats] = useState<string[]>([])
   
   // Form setup
   const {
@@ -74,6 +78,9 @@ export default function NewDesignPage() {
     
     setImageFiles(prev => [...prev, ...newFiles])
     setImagePreviews(prev => [...prev, ...newPreviews])
+    
+    // Reset the input to allow re-uploading the same file
+    e.target.value = ''
   }
   
   // Handle image removal
@@ -91,19 +98,39 @@ export default function NewDesignPage() {
     setImagePreviews(newPreviews)
   }
   
-  // Handle design file upload
-  const handleDesignFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle design file upload for specific format
+  const handleDesignFileUpload = (format: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return
     
     const file = e.target.files[0]
-    setDesignFile(file)
-    setDesignFileName(file.name)
+    setDesignFiles(prev => ({
+      ...prev,
+      [format]: file
+    }))
+    
+    // Reset the input to allow re-uploading the same file
+    e.target.value = ''
   }
   
-  // Handle design file removal
-  const handleRemoveDesignFile = () => {
-    setDesignFile(null)
-    setDesignFileName('')
+  // Handle design file removal for specific format
+  const handleRemoveDesignFile = (format: string) => {
+    setDesignFiles(prev => ({
+      ...prev,
+      [format]: null
+    }))
+  }
+  
+  // Handle format checkbox change - remove file if format is unchecked
+  const handleFormatChange = (format: string, checked: boolean) => {
+    if (checked) {
+      setSelectedFormats(prev => [...prev, format])
+    } else {
+      setSelectedFormats(prev => prev.filter(f => f !== format))
+      setDesignFiles(prev => ({
+        ...prev,
+        [format]: null
+      }))
+    }
   }
   
   // Create design mutation
@@ -140,7 +167,7 @@ export default function NewDesignPage() {
     })
     
     // Add formats
-    data.formats.forEach(format => {
+    selectedFormats.forEach(format => {
       formData.append('formats', format)
     })
     
@@ -153,6 +180,13 @@ export default function NewDesignPage() {
     // Add images
     imageFiles.forEach(file => {
       formData.append('images', file)
+    })
+    
+    // Add design files for each format
+    Object.entries(designFiles).forEach(([format, file]) => {
+      if (file) {
+        formData.append(`designFiles[${format}]`, file)
+      }
     })
     
     // Submit the form
@@ -308,19 +342,66 @@ export default function NewDesignPage() {
               {/* Formats */}
               <div>
                 <h2 className="text-lg font-medium text-gray-900 mb-4">Available Formats</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="space-y-4">
                   {['SVG', 'PNG', 'DST', 'PES', 'JEF', 'EXP', 'HUS', 'VP3'].map(format => (
-                    <div key={format} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`format-${format}`}
-                        value={format}
-                        {...register('formats')}
-                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                      />
-                      <label htmlFor={`format-${format}`} className="ml-3 block text-sm font-medium text-gray-700">
-                        {format}
-                      </label>
+                    <div key={format} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center mb-3">
+                        <input
+                          type="checkbox"
+                          id={`format-${format}`}
+                          value={format}
+                          checked={selectedFormats.includes(format)}
+                          onChange={(e) => handleFormatChange(format, e.target.checked)}
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor={`format-${format}`} className="ml-3 block text-sm font-medium text-gray-700">
+                          {format}
+                        </label>
+                      </div>
+                      
+                      {/* File input for this format */}
+                      {selectedFormats.includes(format) && (
+                        <div className="ml-7">
+                          <div className="flex items-center justify-center w-full">
+                            <label
+                              htmlFor={`file-upload-${format}`}
+                              className="flex flex-col items-center justify-center w-full h-20 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                            >
+                              <div className="flex flex-col items-center justify-center">
+                                <Upload className="w-5 h-5 text-gray-400 mb-1" />
+                                <p className="text-xs text-gray-600">Upload {format} file</p>
+                              </div>
+                              <input
+                                key={`file-upload-${format}-${selectedFormats.includes(format)}`}
+                                id={`file-upload-${format}`}
+                                type="file"
+                                accept={`.${format.toLowerCase()}`}
+                                onChange={(e) => handleDesignFileUpload(format, e)}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+                          
+                          {/* Show uploaded file name and remove option */}
+                          {designFiles[format] && (
+                            <div className="mt-2 flex items-center justify-between bg-green-50 border border-green-200 rounded-md p-2">
+                              <div className="flex items-center">
+                                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                <span className="text-sm text-green-800 font-medium">
+                                  {designFiles[format]?.name}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveDesignFile(format)}
+                                className="text-red-500 hover:text-red-700 p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -341,6 +422,7 @@ export default function NewDesignPage() {
                         <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                       </div>
                       <input
+                        key={`image-upload-${imageFiles.length}`}
                         id="image-upload"
                         type="file"
                         accept="image/*"
@@ -363,7 +445,7 @@ export default function NewDesignPage() {
                           />
                           <button
                             type="button"
-                            onClick={() => removeImage(index)}
+                            onClick={() => handleRemoveImage(index)}
                             className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -379,7 +461,7 @@ export default function NewDesignPage() {
               <div className="pt-4 border-t border-gray-200">
                 <button
                   type="submit"
-                  disabled={isSubmitting || imageFiles.length === 0}
+                  disabled={isSubmitting || (imageFiles.length === 0 && Object.values(designFiles).every(file => !file))}
                   className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? 'Creating...' : 'Create Design'}

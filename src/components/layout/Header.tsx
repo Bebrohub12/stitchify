@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { Search, Menu, X, User } from 'lucide-react'
+import { Search, Menu, X, User, Heart } from 'lucide-react'
 import SearchBar from '../common/SearchBar'
 
 const Header = () => {
@@ -39,6 +39,12 @@ const Header = () => {
             <Link href="/designs" className="text-primary-800 hover:text-primary-900 font-medium border-b-2 border-transparent hover:border-primary-900 py-1 transition-all">
               All Designs
             </Link>
+            {isAuthenticated && (
+              <Link href="/favorites" className="text-primary-800 hover:text-primary-900 font-medium border-b-2 border-transparent hover:border-primary-900 py-1 transition-all flex items-center space-x-1">
+                <Heart className="w-4 h-4" />
+                <span>Favorites</span>
+              </Link>
+            )}
             <Link href="/contact" className="text-primary-800 hover:text-primary-900 font-medium border-b-2 border-transparent hover:border-primary-900 py-1 transition-all">
               Contact
             </Link>
@@ -138,6 +144,16 @@ const Header = () => {
               >
                 All Designs
               </Link>
+              {isAuthenticated && (
+                <Link
+                  href="/favorites"
+                  className="text-gray-700 hover:text-primary-600 font-medium flex items-center space-x-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Heart className="w-4 h-4" />
+                  <span>Favorites</span>
+                </Link>
+              )}
               <Link
                 href="/contact"
                 className="text-gray-700 hover:text-primary-600 font-medium"

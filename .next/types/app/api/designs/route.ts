@@ -1,4 +1,4 @@
-// File: C:\stitchify\client\src\app\api\designs\route.ts
+// File: C:\stitchify\src\app\api\designs\route.ts
 import * as entry from '../../../../../src/app/api/designs/route.js'
 import type { NextRequest } from 'next/server.js'
 

@@ -8,9 +8,8 @@ export interface IDesign extends Document {
     url: string
     alt: string
   }>
-  designFile?: {
-    url: string
-    filename: string
+  designFiles?: {
+    [key: string]: string
   }
   categories: mongoose.Types.ObjectId[]
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced'
@@ -22,6 +21,7 @@ export interface IDesign extends Document {
   }
   sales: number
   featured: boolean
+  popular: boolean
   formats: string[]
   tags: string[]
   createdAt: Date
@@ -53,15 +53,9 @@ const DesignSchema = new Schema<IDesign>({
       required: true
     }
   }],
-  designFile: {
-    url: {
-      type: String,
-      required: true
-    },
-    filename: {
-      type: String,
-      required: true
-    }
+  designFiles: {
+    type: Map,
+    of: String
   },
   categories: [{
     type: Schema.Types.ObjectId,
@@ -98,6 +92,10 @@ const DesignSchema = new Schema<IDesign>({
     default: 0
   },
   featured: {
+    type: Boolean,
+    default: false
+  },
+  popular: {
     type: Boolean,
     default: false
   },

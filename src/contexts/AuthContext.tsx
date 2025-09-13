@@ -35,6 +35,7 @@ interface AuthContextType {
   login: (formData: { email: string; password: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateProfile: (formData: { username: string; email: string }) => Promise<{ success: boolean; message?: string }>;
+  updateFavorites: (designId: string, isFavorited: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -193,6 +194,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  // Update favorites
+  const updateFavorites = (designId: string, isFavorited: boolean) => {
+    if (!state.user) return;
+    
+    const updatedUser = { ...state.user };
+    if (isFavorited) {
+      // Add to favorites if not already present
+      if (!updatedUser.favorites?.includes(designId)) {
+        updatedUser.favorites = [...(updatedUser.favorites || []), designId];
+      }
+    } else {
+      // Remove from favorites
+      updatedUser.favorites = updatedUser.favorites?.filter(id => id !== designId) || [];
+    }
+    
+    dispatch({
+      type: 'UPDATE_USER',
+      payload: updatedUser,
+    });
+  };
+
   const value: AuthContextType = {
     user: state.user,
     token: state.token,
@@ -202,6 +224,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     logout,
     updateProfile,
+    updateFavorites,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

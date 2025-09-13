@@ -1,4 +1,4 @@
-// File: C:\stitchify\client\src\app\admin\page.tsx
+// File: C:\stitchify\src\app\admin\page.tsx
 import * as entry from '../../../../src/app/admin/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

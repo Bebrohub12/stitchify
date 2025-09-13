@@ -114,6 +114,7 @@ async function seed() {
         rating: { average: 4.8, count: 23 },
         sales: 67,
         featured: true,
+        popular: true,
         formats: ['SVG', 'PNG', 'DST', 'PES', 'JEF', 'EXP', 'HUS', 'VP3'],
         tags: ['roses', 'garden', 'spring', 'floral']
       },
@@ -132,6 +133,7 @@ async function seed() {
         rating: { average: 4.9, count: 18 },
         sales: 45,
         featured: true,
+        popular: true,
         formats: ['SVG', 'PNG', 'DST', 'PES', 'JEF', 'EXP', 'HUS', 'VP3'],
         tags: ['eagle', 'bird', 'wildlife', 'patriotic']
       },
@@ -149,6 +151,7 @@ async function seed() {
         rating: { average: 4.7, count: 45 },
         sales: 89,
         featured: false,
+        popular: true,
         formats: ['SVG', 'PNG', 'DST', 'PES', 'JEF', 'EXP', 'HUS', 'VP3'],
         tags: ['sunflower', 'summer', 'yellow', 'beginner']
       },
@@ -166,6 +169,7 @@ async function seed() {
         rating: { average: 4.6, count: 34 },
         sales: 72,
         featured: false,
+        popular: false,
         formats: ['SVG', 'PNG', 'DST', 'PES', 'JEF', 'EXP', 'HUS', 'VP3'],
         tags: ['deer', 'wildlife', 'forest', 'nature']
       }

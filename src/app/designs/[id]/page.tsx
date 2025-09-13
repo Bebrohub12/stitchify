@@ -31,7 +31,7 @@ interface Design {
 export default function DesignDetailPage() {
   const params = useParams()
   const designId = params.id as string
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, updateFavorites } = useAuth()
   const queryClient = useQueryClient()
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isPurchased, setIsPurchased] = useState(false)
@@ -71,7 +71,9 @@ export default function DesignDetailPage() {
       const response = await axios.post(`/api/designs/${designId}/favorite`)
       return response.data
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Update the local state immediately
+      updateFavorites(designId, data.favorited)
       queryClient.invalidateQueries({ queryKey: ['design'] })
       queryClient.invalidateQueries({ queryKey: ['featuredDesigns'] })
       queryClient.invalidateQueries({ queryKey: ['popularDesigns'] })
@@ -134,7 +136,7 @@ export default function DesignDetailPage() {
     }
   }
 
-  const isFavorited = user?.favorites?.some((fav: any) => fav._id === designId)
+  const isFavorited = user?.favorites?.includes(designId)
   const purchased = purchaseStatus?.purchased || false
 
   if (isLoading) {
@@ -188,10 +190,10 @@ export default function DesignDetailPage() {
           </ol>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Image Gallery */}
-          <div className="space-y-4">
-            <div className="relative aspect-square bg-white rounded-lg overflow-hidden shadow-lg">
+          <div className="space-y-3">
+            <div className="relative h-80 bg-white rounded-lg overflow-hidden shadow-md">
               {design.images && design.images[currentImageIndex] ? (
                 <img
                   src={design.images[currentImageIndex].url}
@@ -200,7 +202,7 @@ export default function DesignDetailPage() {
                 />
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                  <span className="text-gray-500 text-lg">No Image</span>
+                  <span className="text-gray-500">No Image</span>
                 </div>
               )}
 
@@ -209,15 +211,15 @@ export default function DesignDetailPage() {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full shadow-md transition-colors"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white p-1.5 rounded-full shadow-md transition-colors"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </>
               )}
@@ -225,21 +227,21 @@ export default function DesignDetailPage() {
               {/* Favorite Button */}
               <button
                 onClick={handleFavorite}
-                className={`absolute top-4 right-4 p-3 rounded-full transition-colors ${
+                className={`absolute top-2 right-2 p-2 rounded-full transition-colors ${
                   isFavorited
                     ? 'bg-red-500 text-white hover:bg-red-600'
-                    : 'bg-white/80 text-gray-600 hover:bg-white hover:text-red-500'
+                    : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500'
                 }`}
               >
-                <Heart className={`w-6 h-6 ${isFavorited ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 ${isFavorited ? 'fill-current' : ''}`} />
               </button>
 
               {/* Difficulty Badge */}
-              <div className="absolute top-4 left-4">
-                <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-                  design.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                  design.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-red-100 text-red-800'
+              <div className="absolute top-2 left-2">
+                <span className={`px-2 py-1 text-xs font-medium rounded-md ${
+                  design.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' :
+                  design.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
                 }`}>
                   {design.difficulty}
                 </span>
@@ -253,7 +255,7 @@ export default function DesignDetailPage() {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
                       index === currentImageIndex
                         ? 'border-primary-500'
                         : 'border-gray-300 hover:border-gray-400'
@@ -271,15 +273,15 @@ export default function DesignDetailPage() {
           </div>
 
           {/* Design Information */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{design.title}</h1>
-              <p className="text-gray-600 text-lg">{design.description}</p>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">{design.title}</h1>
+              <p className="text-gray-600 text-sm leading-relaxed">{design.description}</p>
             </div>
 
             {/* Price and Rating */}
             <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold text-primary-600">
+              <div className="text-2xl font-bold text-primary-600">
                 ${design.price.toFixed(2)}
               </div>
               <div className="flex items-center space-x-2">
@@ -287,7 +289,7 @@ export default function DesignDetailPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
+                      className={`w-4 h-4 ${
                         i < Math.floor(design.rating?.average || 0)
                           ? 'text-yellow-400 fill-current'
                           : 'text-gray-300'
@@ -295,38 +297,38 @@ export default function DesignDetailPage() {
                     />
                   ))}
                 </div>
-                <span className="text-gray-600">
+                <span className="text-sm text-gray-600">
                   ({design.rating?.count || 0} reviews)
                 </span>
               </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 py-4 border-t border-b border-gray-200">
+            <div className="grid grid-cols-3 gap-3 py-3 border-t border-b border-gray-200">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{design.stitchCount || 'N/A'}</div>
-                <div className="text-sm text-gray-600">Stitches</div>
+                <div className="text-lg font-bold text-gray-900">{design.stitchCount || 'N/A'}</div>
+                <div className="text-xs text-gray-600">Stitches</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{design.downloads || 0}</div>
-                <div className="text-sm text-gray-600">Downloads</div>
+                <div className="text-lg font-bold text-gray-900">{design.downloads || 0}</div>
+                <div className="text-xs text-gray-600">Downloads</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">{design.sales || 0}</div>
-                <div className="text-sm text-gray-600">Sales</div>
+                <div className="text-lg font-bold text-gray-900">{design.sales || 0}</div>
+                <div className="text-xs text-gray-600">Sales</div>
               </div>
             </div>
 
             {/* Categories */}
             {design.categories && design.categories.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Categories</h3>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="text-xs font-medium text-gray-700 mb-2">Categories</h3>
+                <div className="flex flex-wrap gap-1">
                   {design.categories.map((category) => (
                     <Link
                       key={category._id}
                       href={`/categories/${category._id}`}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md text-xs hover:bg-gray-200 transition-colors"
                     >
                       {category.name}
                     </Link>
@@ -338,12 +340,12 @@ export default function DesignDetailPage() {
             {/* Tags */}
             {design.tags && design.tags.length > 0 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Tags</h3>
-                <div className="flex flex-wrap gap-2">
+                <h3 className="text-xs font-medium text-gray-700 mb-2">Tags</h3>
+                <div className="flex flex-wrap gap-1">
                   {design.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                      className="px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs"
                     >
                       {tag}
                     </span>
@@ -354,12 +356,12 @@ export default function DesignDetailPage() {
 
             {/* Supported Formats */}
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Supported Formats</h3>
-              <div className="grid grid-cols-4 gap-2">
+              <h3 className="text-xs font-medium text-gray-700 mb-2">Supported Formats</h3>
+              <div className="grid grid-cols-4 gap-1">
                 {design.formats?.map((format) => (
                   <span
                     key={format}
-                    className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm text-center font-medium"
+                    className="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs text-center font-medium"
                   >
                     {format}
                   </span>
@@ -368,31 +370,31 @@ export default function DesignDetailPage() {
             </div>
 
             {/* Action Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {purchased ? (
-                <button className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
-                  <Download className="w-5 h-5" />
+                <button className="w-full bg-green-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                  <Download className="w-4 h-4" />
                   Download Design
                 </button>
               ) : (
                 <button
                   onClick={handlePurchase}
                   disabled={createPayment.isLoading}
-                  className="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  className="w-full bg-primary-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-4 h-4" />
                   {createPayment.isLoading ? 'Processing...' : 'Purchase Design'}
                 </button>
               )}
 
-              <button className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
-                <Share2 className="w-5 h-5" />
+              <button className="w-full bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                <Share2 className="w-4 h-4" />
                 Share Design
               </button>
             </div>
 
             {/* Additional Info */}
-            <div className="text-sm text-gray-500 space-y-1">
+            <div className="text-xs text-gray-500 space-y-1">
               <p>Added: {new Date(design.createdAt).toLocaleDateString()}</p>
               {design.updatedAt !== design.createdAt && (
                 <p>Updated: {new Date(design.updatedAt).toLocaleDateString()}</p>

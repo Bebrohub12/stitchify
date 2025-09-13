@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Filter, Grid, List, Search, SlidersHorizontal } from 'lucide-react'
 import axios from 'axios'
 import DesignCard from '@/components/designs/DesignCard'
+import DesignCardList from '@/components/designs/DesignCardList'
 import SearchBar from '@/components/common/SearchBar'
 
 interface Design {
@@ -280,11 +281,15 @@ export default function DesignsPage() {
           </div>
         ) : (
           <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-            : 'space-y-4'
+            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4'
+            : 'space-y-3'
           }>
             {designs.map((design: Design) => (
-              <DesignCard key={design._id} design={design} />
+              viewMode === 'grid' ? (
+                <DesignCard key={design._id} design={design} />
+              ) : (
+                <DesignCardList key={design._id} design={design} />
+              )
             ))}
           </div>
         )}

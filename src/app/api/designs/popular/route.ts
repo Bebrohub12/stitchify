@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '8')
 
-    const designs = await Design.find()
+    const designs = await Design.find({ popular: true })
       .populate('categories', 'name slug')
       .sort({ sales: -1, downloads: -1, rating: -1 })
       .limit(limit)

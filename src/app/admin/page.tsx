@@ -12,7 +12,8 @@ import {
   Edit,
   Trash2,
   Eye,
-  Download
+  Download,
+  Star
 } from 'lucide-react'
 import axios from 'axios'
 import AdminRoute from '@/components/auth/AdminRoute'
@@ -43,6 +44,23 @@ interface DashboardStats {
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'designs' | 'categories' | 'users'>('overview')
+  const [updatingPopular, setUpdatingPopular] = useState<string | null>(null)
+
+  // Toggle popular status
+  const togglePopular = async (designId: string, currentPopular: boolean) => {
+    setUpdatingPopular(designId)
+    try {
+      await axios.patch(`/api/admin/designs/${designId}/popular`, {
+        popular: !currentPopular
+      })
+      // Refetch data
+      window.location.reload()
+    } catch (error) {
+      console.error('Failed to toggle popular status:', error)
+    } finally {
+      setUpdatingPopular(null)
+    }
+  }
 
   // Fetch dashboard stats
   const { data: stats, isLoading } = useQuery({
@@ -307,6 +325,9 @@ export default function AdminDashboard() {
                               Status
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Popular
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Actions
                             </th>
                           </tr>
@@ -347,6 +368,20 @@ export default function AdminDashboard() {
                                 }`}>
                                   {design.featured ? 'Featured' : 'Active'}
                                 </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <button
+                                  onClick={() => togglePopular(design._id, design.popular)}
+                                  disabled={updatingPopular === design._id}
+                                  className={`flex items-center space-x-1 px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                                    design.popular 
+                                      ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' 
+                                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                                  } ${updatingPopular === design._id ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                >
+                                  <Star className={`w-3 h-3 ${design.popular ? 'fill-current' : ''}`} />
+                                  <span>{design.popular ? 'Popular' : 'Make Popular'}</span>
+                                </button>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div className="flex space-x-2">
