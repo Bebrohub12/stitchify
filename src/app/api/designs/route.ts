@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Get designs error:', error)
     return NextResponse.json(
-      { message: 'Server error' },
+      { message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error', "error1": error },
       { status: 500 }
     )
   }
