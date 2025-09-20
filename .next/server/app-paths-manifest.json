@@ -2,7 +2,13 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/login/page": "app/login/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/admin/dashboard/route": "app/api/admin/dashboard/route.js",
+  "/api/admin/designs/route": "app/api/admin/designs/route.js",
+  "/admin/designs/[id]/page": "app/admin/designs/[id]/page.js",
+  "/api/admin/designs/[id]/route": "app/api/admin/designs/[id]/route.js",
+  "/designs/page": "app/designs/page.js",
   "/api/categories/main/route": "app/api/categories/main/route.js",
-  "/api/designs/route": "app/api/designs/route.js",
-  "/designs/page": "app/designs/page.js"
+  "/api/designs/route": "app/api/designs/route.js"
 }

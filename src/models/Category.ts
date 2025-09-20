@@ -51,4 +51,6 @@ CategorySchema.pre('save', function(next) {
   next()
 })
 
-export default mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema)
+// Fix model registration issue by checking if model exists first
+const Category = mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema)
+export default Category
