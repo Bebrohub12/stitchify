@@ -220,7 +220,7 @@ export default function AdminDesignDetailPage() {
                 {/* Thumbnail Gallery */}
                 {design.images && design.images.length > 1 && (
                   <div className="p-4 flex space-x-2 overflow-x-auto">
-                    {design.images.map((image: { url: string; alt: string }, index) => (
+                    {design.images.map((image: { url: string; alt: string }, index: number) => (
                       <button
                         key={index}
                         onClick={() => setCurrentImageIndex(index)}
@@ -254,7 +254,7 @@ export default function AdminDesignDetailPage() {
                 <div className="mt-8 bg-white rounded-lg shadow p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Available Formats</h2>
                   <div className="flex flex-wrap gap-2">
-                    {design.formats.map((format, index) => (
+                    {design.formats.map((format: string, index: number) => (
                       <span
                         key={index}
                         className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
@@ -271,7 +271,7 @@ export default function AdminDesignDetailPage() {
                 <div className="mt-8 bg-white rounded-lg shadow p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Tags</h2>
                   <div className="flex flex-wrap gap-2">
-                    {design.tags.map((tag, index) => (
+                    {design.tags.map((tag: string, index: number) => (
                       <span
                         key={index}
                         className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
@@ -305,7 +305,7 @@ export default function AdminDesignDetailPage() {
                   <div>
                     <p className="text-sm text-gray-500">Categories</p>
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {design.categories.map((category) => (
+                      {design.categories.map((category: { _id: string; name: string }) => (
                         <span
                           key={category._id}
                           className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"

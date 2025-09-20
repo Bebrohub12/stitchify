@@ -75,31 +75,35 @@ export default function EditDesignPage() {
   const { data: design, isLoading } = useQuery({
     queryKey: ['adminDesignEdit', designId],
     queryFn: async () => {
-      const response = await axios.get(`/api/designs/${designId}`)
+      const response = await axios.get(`/api/admin/designs/${designId}`)
       return response.data
-    },
-    onSuccess: (data) => {
+    }
+  })
+  
+  // Handle form population when data is loaded
+  useEffect(() => {
+    if (design) {
       // Populate form with existing design data
       reset({
-        title: data.title,
-        description: data.description,
-        price: data.price,
-        difficulty: data.difficulty,
-        stitchCount: data.stitchCount,
-        categories: data.categories.map((cat: any) => cat._id),
-        formats: data.formats,
-        tags: data.tags.join(', '),
-        featured: data.featured,
-        popular: data.popular || false
+        title: design.title,
+        description: design.description,
+        price: design.price,
+        difficulty: design.difficulty,
+        stitchCount: design.stitchCount,
+        categories: design.categories.map((cat: any) => cat._id),
+        formats: design.formats,
+        tags: design.tags.join(', '),
+        featured: design.featured,
+        popular: design.popular || false
       })
       
       // Set existing images
-      setExistingImages(data.images || [])
+      setExistingImages(design.images || [])
       
       // Set selected formats
-      setSelectedFormats(data.formats || [])
+      setSelectedFormats(design.formats || [])
     }
-  })
+  }, [design, reset])
 
   // Handle image selection
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
