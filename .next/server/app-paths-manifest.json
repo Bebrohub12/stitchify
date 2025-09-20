@@ -2,14 +2,7 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
   "/api/auth/me/route": "app/api/auth/me/route.js",
-  "/login/page": "app/login/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/api/users/profile/route": "app/api/users/profile/route.js",
-  "/api/users/favorites/route": "app/api/users/favorites/route.js",
-  "/api/users/purchases/route": "app/api/users/purchases/route.js",
-  "/designs/page": "app/designs/page.js",
-  "/api/designs/route": "app/api/designs/route.js",
   "/api/categories/main/route": "app/api/categories/main/route.js",
-  "/api/designs/[id]/favorite/route": "app/api/designs/[id]/favorite/route.js",
-  "/favorites/page": "app/favorites/page.js"
+  "/api/designs/route": "app/api/designs/route.js",
+  "/designs/page": "app/designs/page.js"
 }

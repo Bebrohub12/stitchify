@@ -4,6 +4,8 @@ import Design from '@/models/Design'
 import { promises as fs } from 'fs'
 import path from 'path'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication and admin status
